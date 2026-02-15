@@ -54,16 +54,79 @@
  */
 export function createThaliDescription(thali) {
   // Your code here
+  if (typeof thali !== "object" || thali == null) return "";
+  if (
+    !thali.hasOwnProperty("name") ||
+    !thali.hasOwnProperty("items") ||
+    !thali.hasOwnProperty("price") ||
+    !thali.hasOwnProperty("isVeg")
+  )
+    return "";
+  return `${thali.name?.toUpperCase()} (${thali.isVeg ? "Veg" : "Non-Veg"}) - Items: ${thali.items?.join(", ")} - Rs.${thali.price.toFixed(2)}`;
 }
 
 export function getThaliStats(thalis) {
   // Your code here
+
+  let vegCount, nonVegCount, avgPrice, cheapest, costliest, names, listOfprices;
+  if (thalis === null) return null;
+  if (!Array.isArray(thalis) || thalis.length === 0) return null;
+
+  vegCount = thalis.filter((x) => x.isVeg).length;
+  nonVegCount = thalis.filter((x) => !x.isVeg).length;
+  avgPrice =
+    thalis.reduce((sum, x) => (sum += Number(x.price)), 0) / thalis.length;
+  listOfprices = thalis.map((x) => x.price);
+
+  names = thalis.map((x) => x.name);
+
+  return {
+    totalThalis: thalis.length,
+    vegCount: vegCount,
+    nonVegCount: nonVegCount,
+    avgPrice: avgPrice.toFixed(2),
+    cheapest: Math.min(...listOfprices),
+    costliest: Math.max(...listOfprices),
+    names: names,
+  };
 }
 
 export function searchThaliMenu(thalis, query) {
   // Your code here
+  if (!Array.isArray(thalis) || typeof query !== "string") return [];
+
+  const queryInUpper = query.toUpperCase();
+  let filteredThali = thalis.filter((x) => {
+    let itemsHasQuery = x.items.filter((y) =>
+      y.toUpperCase().includes(queryInUpper),
+    );
+
+    return x.name.toUpperCase().includes(queryInUpper) || itemsHasQuery.length;
+  });
+
+  return filteredThali.length > 0 ? filteredThali : [];
 }
+
+// - Template literals + .map() + .join("\n") + .reduce() se receipt banao
+//  *      - Format:
+//  *        "THALI RECEIPT\n---\nCustomer: {NAME}\n{line items}\n---\nTotal: Rs.{total}\nItems: {count}"
+//  *      - Line item: "- {thali name} x Rs.{price}"
+//  *      - customerName UPPERCASE mein
+//  *      - Agar customerName string nahi hai ya thalis array nahi hai/empty hai, return ""
 
 export function generateThaliReceipt(customerName, thalis) {
   // Your code here
+  if (
+    typeof customerName !== "string" ||
+    !Array.isArray(thalis) ||
+    thalis.length === 0
+  )
+    return "";
+
+  let total = thalis.reduce((acc, o) => acc + o.price, 0);
+  let thalisNameWithPrice = thalis
+    .map((y) => `- ${y.name} x Rs.${y.price}`)
+    .join("\n");
+
+  return `THALI RECEIPT\n---\nCustomer: ${customerName.toUpperCase()}\n${thalisNameWithPrice}\n---\nTotal: Rs.${total}\nItems: ${thalis.length}`;
 }

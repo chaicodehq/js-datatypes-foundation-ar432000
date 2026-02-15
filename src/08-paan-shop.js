@@ -47,16 +47,34 @@
  */
 export function createPaanOrder(basePaan, customizations) {
   // Your code here
+  if (basePaan === null || typeof basePaan !== "object") return {};
+
+  if (typeof customizations !== "object") return Object.assign({}, basePaan);
+
+  return Object.assign({}, basePaan, customizations);
 }
 
 export function freezeMenu(menu) {
   // Your code here
+  if (typeof menu !== "object" || menu === null) return {};
+
+  return Object.freeze(menu);
 }
 
 export function updatePrices(menu, increase) {
   // Your code here
+  if (typeof menu !== "object" || menu === null || menu === undefined)
+    return {};
+  if (typeof increase !== "number") return {};
+
+  return Object.fromEntries(
+    Object.entries(menu).map(([k, v]) => [k, v + increase]),
+  );
 }
 
 export function mergeDailySpecials(regularMenu, specialsMenu) {
   // Your code here
+  if (typeof regularMenu !== "object" || typeof specialsMenu !== "object")
+    return {};
+  return { ...regularMenu, ...specialsMenu };
 }
